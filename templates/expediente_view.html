@@ -1,0 +1,28 @@
+{% extends "_layout.html" %}
+{% block title %}Expediente{% endblock %}
+{% block content %}
+<h2>Expediente de {{ paciente.nombre }} {{ paciente.apellido }}</h2>
+
+{% if expediente %}
+  <article>
+    <h4>Antecedentes</h4>
+    <p>{{ expediente.antecedentes or '-' }}</p>
+
+    <h4>Alergias</h4>
+    <p>{{ expediente.alergias or '-' }}</p>
+
+    <h4>Notas clínicas</h4>
+    <p style="white-space: pre-wrap;">{{ expediente.notas_clinicas or '-' }}</p>
+
+    <p><small>Creado: {{ expediente.created_at }} · Última actualización: {{ expediente.updated_at }}</small></p>
+  </article>
+{% else %}
+  <p>No existe expediente aún.</p>
+{% endif %}
+
+{% if puede_editar %}
+  <p>
+    <a href="{{ url_for('expediente_edit', paciente_id=paciente.id) }}">Editar expediente</a>
+  </p>
+{% endif %}
+{% endblock %}

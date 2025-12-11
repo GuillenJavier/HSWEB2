@@ -1,0 +1,52 @@
+{% extends "_layout.html" %}
+{% block title %}Mis consultas pendientes{% endblock %}
+{% block content %}
+<section class="card">
+  <a class="media" aria-label="Consultas">
+    <img alt="Consultas" src="https://images.unsplash.com/photo-1516542076529-1ea3854896e1?q=80&w=1600&auto=format&fit=crop">
+  </a>
+  <div class="body">
+    <h2>Mis consultas pendientes</h2>
+
+    {% if selected_paciente %}
+      <p>Mostrando citas del paciente: <strong>{{ selected_paciente.nombre }} {{ selected_paciente.apellido }}</strong></p>
+    {% endif %}
+
+    {% if citas|length == 0 %}
+      <p class="center">No tienes consultas pendientes próximas.</p>
+    {% else %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Paciente</th>
+            <th>Inicio</th>
+            <th>Fin</th>
+            <th>Estado</th>
+            <th>Notas</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in citas %}
+          <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.paciente.nombre }} {{ c.paciente.apellido }}</td>
+            <td>{{ c.start_at }}</td>
+            <td>{{ c.end_at }}</td>
+            <td>{{ c.estado }}</td>
+            <td>{{ c.notas or '-' }}</td>
+            <td>
+              <div class="action-bar" style="margin:0;">
+                <a class="btn btn-primary" href="{{ url_for('citas_edit', cita_id=c.id) }}">Editar</a>
+                <a class="btn btn-ghost" href="{{ url_for('expediente_view', paciente_id=c.paciente.id) }}">Ver expediente</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

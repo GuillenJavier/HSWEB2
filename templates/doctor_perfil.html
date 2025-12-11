@@ -1,0 +1,122 @@
+{% extends "_layout.html" %}
+{% block title %}Perfil del Médico{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Encabezado -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+    <h3 class="m-0">Perfil del Médico</h3>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-secondary" href="{{ url_for('dashboard') }}">Volver al inicio</a>
+      <!-- Botón para registrar paciente nuevo -->
+      <a class="btn btn-primary" href="{{ url_for('doctor_paciente_new') }}">+ Registrar nuevo paciente</a>
+    </div>
+  </div>
+
+  <div class="row g-3">
+    <!-- Tarjeta: Información del médico -->
+    <div class="col-12 col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Información</h5>
+          <div class="mb-2">
+            <span class="fw-semibold">Nombre:</span>
+            {{ medico.usuario.nombre }} {{ medico.usuario.apellido }}
+          </div>
+          <div class="mb-2">
+            <span class="fw-semibold">Especialidad:</span>
+            {{ medico.especialidad }}
+          </div>
+          <div class="mb-0">
+            <span class="fw-semibold">Correo:</span>
+            {{ medico.usuario.email }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta: Citas de hoy y próximas -->
+    <div class="col-12 col-lg-6">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-3">Citas de hoy y próximas</h5>
+            <a class="btn btn-sm btn-outline-primary" href="{{ url_for('doctor_consultas') }}">Ver pendientes</a>
+          </div>
+
+          {% if citas and citas|length > 0 %}
+            <ul class="list-group list-group-flush">
+              {% for c in citas %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div>
+                    <div class="fw-semibold">{{ c.start_at.strftime("%d/%m/%Y %H:%M") }}</div>
+                    <div>{{ c.paciente.nombre }} {{ c.paciente.apellido }}</div>
+                    <div class="small text-muted">Estado: {{ c.estado.value }}</div>
+                  </div>
+                  <div class="d-flex gap-2">
+                    <a class="btn btn-sm btn-outline-primary" href="{{ url_for('appointments_edit', cita_id=c.id) if 'appointments_edit' in self.environment.globals else url_for('citas_edit', cita_id=c.id) }}">
+                      Editar
+                    </a>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <p class="text-muted m-0">Sin citas programadas.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Encabezado y botón: Pacientes -->
+    <div class="col-12 mt-2">
+      <div class="d-flex justify-content-between align-items-center">
+        <h4 class="m-0">Pacientes atendidos</h4>
+        <a class="btn btn-primary" href="{{ url_for('doctor_paciente_new') }}">+ Registrar nuevo paciente</a>
+      </div>
+    </div>
+
+    <!-- Lista de pacientes con acciones -->
+    <div class="col-12">
+      <div class="card shadow-sm">
+        <div class="card-body p-0">
+          {% if pacientes and pacientes|length > 0 %}
+            <ul class="list-group list-group-flush">
+              {% for p in pacientes %}
+                <li class="list-group-item d-flex justify-content-between align-items-center">
+                  <div class="me-3">
+                    <div class="fw-semibold">{{ p.apellido }}, {{ p.nombre }}</div>
+                    <div class="small text-muted">{{ p.email }}</div>
+                  </div>
+                  <div class="btn-group">
+                    <!-- Agendar cita para este paciente -->
+                    <a class="btn btn-sm btn-outline-primary"
+                       href="{{ url_for('appointments_new', paciente_id=p.id) if 'appointments_new' in self.environment.globals else url_for('citas_new', paciente_id=p.id) }}">
+                      Agendar cita
+                    </a>
+                    <!-- Ver expediente -->
+                    <a class="btn btn-sm btn-outline-secondary"
+                       href="{{ url_for('expediente_view', paciente_id=p.id) }}">
+                      Expediente
+                    </a>
+                    <!-- Ver citas pendientes del paciente (del doctor) -->
+                    <a class="btn btn-sm btn-outline-success"
+                       href="{{ url_for('doctor_consultas', paciente_id=p.id) }}">
+                      Citas pendientes
+                    </a>
+                  </div>
+                </li>
+              {% endfor %}
+            </ul>
+          {% else %}
+            <div class="p-3">
+              <p class="text-muted m-0">Aún no hay pacientes registrados o atendidos.</p>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

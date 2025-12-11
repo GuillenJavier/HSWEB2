@@ -1,0 +1,26 @@
+{% extends "_layout.html" %}
+{% block title %}Doctores{% endblock %}
+{% block content %}
+<h2>Doctores</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>#</th>
+      <th>Nombre</th>
+      <th>Especialidad</th>
+      <th>Perfil</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for d in doctores %}
+    <tr>
+      <td>{{ d.id }}</td>
+      <td>{{ d.usuario.nombre }} {{ d.usuario.apellido }}</td>
+      <td>{{ d.especialidad }}</td>
+      <td><a href="{{ url_for('doctor_perfil', medico_id=d.id) }}">Ver perfil</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

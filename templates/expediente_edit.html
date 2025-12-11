@@ -1,0 +1,22 @@
+{% extends "_layout.html" %}
+{% block title %}Editar expediente{% endblock %}
+{% block content %}
+<h2>Editar expediente de {{ paciente.nombre }} {{ paciente.apellido }}</h2>
+
+<form method="post">
+  <label>Antecedentes
+    <textarea name="antecedentes" rows="3">{{ expediente.antecedentes if expediente else '' }}</textarea>
+  </label>
+
+  <label>Alergias
+    <textarea name="alergias" rows="3">{{ expediente.alergias if expediente else '' }}</textarea>
+  </label>
+
+  <label>Notas clínicas
+    <textarea name="notas_clinicas" rows="8">{{ expediente.notas_clinicas if expediente else '' }}</textarea>
+  </label>
+
+  <button type="submit">Guardar</button>
+  <a href="{{ url_for('expediente_view', paciente_id=paciente.id) }}">Cancelar</a>
+</form>
+{% endblock %}

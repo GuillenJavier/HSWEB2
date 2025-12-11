@@ -1,0 +1,146 @@
+{% extends "_layout.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+{% if current_user.tipo == 'MEDICO' %}
+  <!-- HERO DOCTOR -->
+  <section class="hero">
+    <img class="hero-bg" alt="Fondo de salud" src="https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=1600&auto=format&fit=crop">
+    <div class="overlay"></div>
+    <div>
+      <h1 style="margin:0 0 .25rem 0;">
+        {% if saludo and doctor_nombre %}{{ saludo }}, {{ doctor_nombre }}.{% else %}Bienvenido(a) doctor(a).{% endif %}
+      </h1>
+      <p style="opacity:.95;margin:0;">Gestiona tus citas, pacientes y expedientes desde un solo lugar.</p>
+      <div class="action-bar cta">
+        <a class="btn btn-primary" href="{{ url_for('doctor_consultas') }}">Mis citas pendientes</a>
+        <a class="btn btn-ghost" href="{{ url_for('doctor_concluidas') }}">Citas concluidas</a>
+        <a class="btn btn-secondary" href="{{ url_for('doctor_expedientes') }}">Expedientes</a>
+        {% if current_user.tipo == 'MEDICO' %}
+    <a class="btn btn-warning" href="{{ url_for('doctor_paciente_new') }}"> Registrar paciente</a>
+    {% if current_user.is_authenticated and current_user.tipo == 'MEDICO' %}
+  <li class="nav-item">
+    <a class="btn btn-sm btn-success" href="{{ url_for('doctor_appointments_new') }}">Agendar cita</a>
+  </li>
+{% endif %}
+
+  {% endif %}
+</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="grid2">
+    <!-- Columna izquierda: pacientes -->
+    <div class="card">
+      <a class="media" aria-label="Pacientes">
+        <img alt="Pacientes" src="https://images.unsplash.com/photo-1583912267551-4f33492a2701?q=80&w=1600&auto=format&fit=crop">
+      </a>
+      <div class="body">
+        <h3 style="margin:.25rem 0 0.5rem;">Pacientes atendidos</h3>
+        {% if pacientes|length == 0 %}
+          <p class="center">Aún no tienes pacientes registrados por citas.</p>
+        {% else %}
+          <ul style="margin:0;">
+            {% for p in pacientes %}
+              {% set pendientes = pending_counts.get(p.id, 0) %}
+              <li style="display:flex; align-items:center; justify-content:space-between; gap:.75rem; flex-wrap:wrap; padding:.45rem 0;">
+                <div>
+                  <strong>{{ p.nombre }} {{ p.apellido }}</strong>
+                  <span class="chip">{% if pendientes > 0 %}{{ pendientes }} pendiente(s){% else %}Sin pendientes{% endif %}</span>
+                </div>
+                <div class="action-bar" style="margin:0;">
+                  <a class="btn btn-ghost" href="{{ url_for('doctor_consultas', paciente_id=p.id) }}">Ver citas</a>
+                  <a class="btn btn-primary" href="{{ url_for('expediente_view', paciente_id=p.id) }}">Ver expediente</a>
+                </div>
+              </li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Columna derecha: resumen citas -->
+    <div class="card">
+      <a class="media" aria-label="Calendario">
+        <img alt="Calendario" src="https://images.unsplash.com/photo-1512412046876-f386342eddb5?q=80&w=1600&auto=format&fit=crop">
+      </a>
+      <div class="body">
+        <h3 style="margin:.25rem 0 0.5rem;">Resumen reciente</h3>
+        {% if citas|length == 0 %}
+          <p class="center">Aún no hay citas registradas.</p>
+        {% else %}
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Paciente</th>
+                <th>Inicio</th>
+                <th>Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in citas[:6] %}
+              <tr>
+                <td>{{ c.id }}</td>
+                <td>{{ c.paciente.nombre }} {{ c.paciente.apellido }}</td>
+                <td>{{ c.start_at }}</td>
+                <td>{{ c.estado }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          <div class="center" style="margin-top:.75rem;">
+            <a class="btn btn-ghost" href="{{ url_for('doctor_consultas') }}">Ver todas</a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </section>
+
+{% else %}
+  <!-- HERO PACIENTE/ADMIN -->
+  <section class="hero">
+    <img class="hero-bg" alt="Salud" src="{{ url_for('static', filename='img/patients.jpg') }}">
+    <div class="overlay"></div>
+    <div>
+      <h1 style="margin:0 0 .25rem 0;">Bienvenido, {{ current_user.nombre }} {{ current_user.apellido }}</h1>
+      <p style="opacity:.95;margin:0;">Agenda y consulta tus citas fácilmente.</p>
+      <div class="action-bar cta">
+        <a class="btn btn-primary" href="{{ url_for('citas_new') }}">Agendar cita</a>
+        <a class="btn btn-ghost" href="{{ url_for('citas_list') }}">Ver mis citas</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <a class="media" aria-label="Agenda">
+      <img alt="Agenda" src="{{ url_for('static', filename='img/hero.jpg') }}"
+    </a>
+    <div class="body">
+      <h3 style="margin:.25rem 0 0.5rem;">Mis últimas citas</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Médico</th>
+            <th>Inicio</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in citas[:8] %}
+          <tr>
+            <td>{{ c.id }}</td>
+            <td>{{ c.medico.usuario.nombre }} {{ c.medico.usuario.apellido }} ({{ c.medico.especialidad }})</td>
+            <td>{{ c.start_at }}</td>
+            <td>{{ c.estado }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+{% endif %}
+
+{% endblock %}

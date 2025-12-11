@@ -1,0 +1,78 @@
+{% extends "_layout.html" %}
+{% block title %}Editar cita{% endblock %}
+{% block content %}
+<h2>Editar cita #{{ cita.id }}</h2>
+
+<form method="post">
+  {% if puede_editar_todo %}
+    <!-- Admin / Médico: pueden cambiar todo -->
+    <label>Médico
+      <select name="medico_id" required>
+        {% for m in medicos %}
+          <option value="{{ m.id }}" {% if m.id == cita.medico_id %}selected{% endif %}>
+            {{ m.usuario.nombre }} {{ m.usuario.apellido }} — {{ m.especialidad }}
+          </option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Paciente (ID)
+      <input type="number" name="paciente_id" value="{{ cita.paciente_id }}" min="1" required>
+    </label>
+
+    <label>Inicio
+      <input type="datetime-local" name="start_at" value="{{ cita.start_at.strftime('%Y-%m-%dT%H:%M') }}" required>
+    </label>
+
+    <label>Fin
+      <input type="datetime-local" name="end_at" value="{{ cita.end_at.strftime('%Y-%m-%dT%H:%M') }}" required>
+    </label>
+
+    <label>Estado
+      <select name="estado">
+        {% for e in EstadoCita %}
+          <option value="{{ e.value }}" {% if e == cita.estado %}selected{% endif %}>{{ e.value }}</option>
+        {% endfor %}
+      </select>
+    </label>
+
+    <label>Notas
+      <textarea name="notas" rows="3">{{ cita.notas or '' }}</textarea>
+    </label>
+
+  {% else %}
+    <!-- Paciente: solo puede cambiar fechas (start/end) -->
+    <p><strong>Médico:</strong> {{ cita.medico.usuario.nombre }} {{ cita.medico.usuario.apellido }} — {{ cita.medico.especialidad }}</p>
+    <p><strong>Paciente:</strong> {{ cita.paciente.nombre }} {{ cita.paciente.apellido }}</p>
+    <p><strong>Estado:</strong> {{ cita.estado }}</p>
+    <p><strong>Notas:</strong> {{ cita.notas or '-' }}</p>
+
+    <label>Inicio
+      <input type="datetime-local" name="start_at" value="{{ cita.start_at.strftime('%Y-%m-%dT%H:%M') }}" required>
+    </label>
+
+    <label>Fin
+      <input type="datetime-local" name="end_at" value="{{ cita.end_at.strftime('%Y-%m-%dT%H:%M') }}" required>
+    </label>
+  {% endif %}
+
+  <button type="submit">Guardar cambios</button>
+</form>
+
+<hr>
+
+<!-- Apartado de cancelación para ambos roles -->
+<section>
+  <h3>Cancelar cita</h3>
+  {% if current_user.tipo == 'PACIENTE' %}
+    <p>Solo puedes cancelar con al menos <strong>24 horas</strong> de anticipación.</p>
+  {% endif %}
+  {% if cita.estado != EstadoCita.CANCELADA %}
+    <form method="post" action="{{ url_for('citas_cancel', cita_id=cita.id) }}">
+      <button type="submit" onclick="return confirm('¿Seguro que deseas cancelar esta cita?');">Cancelar cita</button>
+    </form>
+  {% else %}
+    <p><em>Esta cita ya está cancelada.</em></p>
+  {% endif %}
+</section>
+{% endblock %}

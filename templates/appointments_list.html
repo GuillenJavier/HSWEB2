@@ -1,0 +1,39 @@
+{% extends "_layout.html" %}
+{% block title %}Citas{% endblock %}
+{% block content %}
+<h2>Citas</h2>
+<p><a href="{{ url_for('citas_new') }}">+ Nueva cita</a></p>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Médico</th>
+<th>Paciente</th>
+<th>Inicio</th>
+<th>Fin</th>
+<th>Estado</th>
+<th>Acciones</th>
+</tr>
+</thead>
+<tbody>
+{% for c in citas %}
+<tr>
+<td>{{ c.id }}</td>
+<td>{{ c.medico.usuario.nombre }} {{ c.medico.usuario.apellido }} ({{ c.medico.especialidad }})</td>
+<td>{{ c.paciente.nombre }} {{ c.paciente.apellido }}</td>
+<td>{{ c.start_at }}</td>
+<td>{{ c.end_at }}</td>
+<td>{{ c.estado }}</td>
+<td>
+<a href="{{ url_for('citas_edit', cita_id=c.id) }}">Editar</a>
+{% if c.estado != EstadoCita.CANCELADA %}
+<form action="{{ url_for('citas_cancel', cita_id=c.id) }}" method="post" style="display:inline">
+<button type="submit">Cancelar</button>
+</form>
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+</tbody>
+</table>
+{% endblock %}

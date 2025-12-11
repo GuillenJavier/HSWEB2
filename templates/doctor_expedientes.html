@@ -1,0 +1,44 @@
+{% extends "_layout.html" %}
+{% block title %}Expedientes de mis pacientes{% endblock %}
+{% block content %}
+<section class="card">
+  <a class="media" aria-label="Expedientes">
+    <img alt="Expedientes" src="https://images.unsplash.com/photo-1582719512121-3b82f39c8e41?q=80&w=1600&auto=format&fit=crop">
+  </a>
+  <div class="body">
+    <h2>Expedientes de mis pacientes</h2>
+
+    {% if pacientes|length == 0 %}
+      <p class="center">No hay pacientes registrados en tu historial de citas.</p>
+    {% else %}
+      <table>
+        <thead>
+          <tr>
+            <th>Paciente</th>
+            <th>Email</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in pacientes %}
+          <tr>
+            <td>{{ p.nombre }} {{ p.apellido }}</td>
+            <td>{{ p.email }}</td>
+            <td>
+              <div class="action-bar" style="margin:0;">
+                <a class="btn btn-primary" href="{{ url_for('expediente_view', paciente_id=p.id) }}">Ver expediente</a>
+                <a class="btn btn-secondary" href="{{ url_for('expediente_edit', paciente_id=p.id) }}">Editar</a>
+                <a class="btn btn-ghost" href="{{ url_for('doctor_consultas', paciente_id=p.id) }}">Ver citas</a>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <div class="center" style="margin-top:.75rem;">
+        <a class="btn btn-ghost" href="{{ url_for('dashboard') }}">← Volver al inicio</a>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}

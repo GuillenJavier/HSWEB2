@@ -1,0 +1,58 @@
+{% extends "_layout.html" %}
+{% block title %}Nueva Cita{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:840px;">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-3">Agendar nueva cita</h3>
+
+      {% if selected_paciente %}
+        <div class="alert alert-info">
+          <strong>Paciente seleccionado:</strong>
+          {{ selected_paciente.apellido }}, {{ selected_paciente.nombre }}
+          <span class="text-muted">({{ selected_paciente.email }})</span>
+        </div>
+      {% endif %}
+
+      <form method="post" action="{{ url_for('appointments_new', paciente_id=selected_paciente.id) if selected_paciente else url_for('appointments_new') }}">
+        {% if selected_paciente %}
+          <input type="hidden" name="paciente_id" value="{{ selected_paciente.id }}">
+        {% endif %}
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Médico</label>
+            <select name="medico_id" class="form-select" required>
+              <option value="" disabled selected>Selecciona un médico</option>
+              {% for m in medicos %}
+                <option value="{{ m.id }}">{{ m.usuario.nombre }} {{ m.usuario.apellido }} — {{ m.especialidad }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Inicio</label>
+            <input type="datetime-local" name="start_at" class="form-control" required>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Fin</label>
+            <input type="datetime-local" name="end_at" class="form-control" required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Notas (opcional)</label>
+            <textarea name="notas" class="form-control" rows="3" placeholder="Motivo, observaciones..."></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a href="{{ request.referrer or url_for('citas_list') }}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

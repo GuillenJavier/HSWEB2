@@ -1,0 +1,29 @@
+{% extends "_layout.html" %}
+{% block title %}Registro{% endblock %}
+{% block content %}
+<h2>Registro</h2>
+<form method="post">
+<label>Nombre
+<input type="text" name="nombre" required>
+</label>
+<label>Apellido
+<input type="text" name="apellido" required>
+</label>
+<label>Email
+<input type="email" name="email" required>
+</label>
+<label>Contraseña
+<input type="password" name="password" required>
+</label>
+<label>Tipo de usuario
+<select name="tipo">
+<option value="PACIENTE">Paciente</option>
+<option value="MEDICO">Médico</option>
+</select>
+</label>
+<label>Especialidad (solo si Médico)
+<input type="text" name="especialidad" placeholder="Cardiología, Pediatría...">
+</label>
+<button type="submit">Crear cuenta</button>
+</form>
+{% endblock %}

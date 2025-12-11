@@ -1,0 +1,81 @@
+{% extends "_layout.html" %}
+{% block title %}Registrar paciente y agendar cita{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:820px;">
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <h3 class="mb-3">Registrar nuevo paciente y agendar su primera cita</h3>
+
+      <form method="post" action="{{ url_for('doctor_paciente_new') }}">
+        <div class="row g-4">
+          <!-- Datos del paciente -->
+          <div class="col-12">
+            <h5 class="border-bottom pb-2">Datos del paciente</h5>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Nombre</label>
+            <input type="text" name="nombre" class="form-control" required>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Apellido</label>
+            <input type="text" name="apellido" class="form-control" required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Correo electrónico (opcional)</label>
+            <input type="email" name="email" class="form-control" placeholder="Ej. paciente@correo.com">
+            <div class="form-text">
+              Si se deja vacío, se asignará un correo temporal interno.
+            </div>
+          </div>
+
+          <!-- Datos de la cita -->
+          <div class="col-12 mt-2">
+            <h5 class="border-bottom pb-2">Datos de la cita</h5>
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Médico</label>
+            <select name="medico_id" class="form-select" required>
+              <option value="" disabled selected>Selecciona un médico</option>
+              {% for m in medicos %}
+                <option value="{{ m.id }}"
+                  {% if medico_actual and m.id == medico_actual.id %}selected{% endif %}>
+                  {{ m.usuario.nombre }} {{ m.usuario.apellido }} — {{ m.especialidad }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Inicio</label>
+            <input type="datetime-local" name="start_at" class="form-control" required>
+          </div>
+
+          <div class="col-md-3">
+            <label class="form-label">Fin</label>
+            <input type="datetime-local" name="end_at" class="form-control" required>
+          </div>
+
+          <div class="col-12">
+            <label class="form-label">Notas (opcional)</label>
+            <textarea name="notas" class="form-control" rows="3" placeholder="Motivo, observaciones..."></textarea>
+          </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-4">
+          <button type="submit" class="btn btn-primary">Guardar</button>
+          <a href="{{ request.referrer or url_for('doctor_expedientes') }}" class="btn btn-outline-secondary">Cancelar</a>
+        </div>
+
+        <div class="form-text mt-3">
+          * Se generará una contraseña temporal de manera automática. Luego podrás compartirla o permitir que el paciente la cambie.
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
